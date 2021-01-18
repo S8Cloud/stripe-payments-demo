@@ -50,13 +50,13 @@ if (ngrok) {
       authtoken: config.ngrok.authtoken,
     })
     .then(url => {
-      console.log(`💳  App URL to see the demo in your browser: ${url}/`);
+      console.log(`App URL to see the demo in your browser: ${url}/`);
     })
     .catch(err => {
       if (err.code === 'ECONNREFUSED') {
-        console.log(`⚠️  Connection refused at ${err.address}:${err.port}`);
+        console.log(`Connection refused at ${err.address}:${err.port}`);
       } else {
-        console.log(`⚠️ Ngrok error: ${JSON.stringify(err)}`);
+        console.log(`Ngrok error: ${JSON.stringify(err)}`);
       }
       process.exit(1);
     });

@@ -11,10 +11,10 @@ require('dotenv').config();
 
 module.exports = {
   // Default country for the checkout form.
-  country: 'US',
+  country: 'GB',
 
   // Store currency.
-  currency: 'eur',
+  currency: 'gbp',
 
   // Supported payment methods for the store.
   // Some payment methods support only a subset of currencies.
@@ -42,7 +42,7 @@ module.exports = {
   // You can fill them in your own `.env` file.
   stripe: {
     // The two-letter country code of your Stripe account (required for Payment Request).
-    country: process.env.STRIPE_ACCOUNT_COUNTRY || 'US',
+    country: process.env.STRIPE_ACCOUNT_COUNTRY || 'GB',
     // API version to set for this app (Stripe otherwise uses your default account version).
     apiVersion: '2019-03-14',
     // Use your test keys for development and live keys for real charges in production.
@@ -61,12 +61,6 @@ module.exports = {
       label: 'Free Shipping',
       detail: 'Delivery within 5 days',
       amount: 0,
-    },
-    {
-      id: 'express',
-      label: 'Express Shipping',
-      detail: 'Next day delivery',
-      amount: 500,
     },
   ],
 

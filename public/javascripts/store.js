@@ -20,7 +20,7 @@ class Store {
   // Compute the total for the payment based on the line items (SKUs and quantity).
   getPaymentTotal() {
     return Object.values(this.lineItems).reduce(
-      (total, {product, sku, quantity}) =>
+      (total, { product, sku, quantity }) =>
         total + quantity * this.products[product].skus.data[0].price,
       0
     );
@@ -50,7 +50,7 @@ class Store {
       }
       return config;
     } catch (err) {
-      return {error: err.message};
+      return { error: err.message };
     }
   }
 
@@ -61,7 +61,7 @@ class Store {
       const skus = await response.json();
       this.products[product_id].skus = skus;
     } catch (err) {
-      return {error: err.message};
+      return { error: err.message };
     }
   }
 
@@ -94,7 +94,7 @@ class Store {
     try {
       const response = await fetch('/payment_intents', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currency,
           items,
@@ -102,12 +102,12 @@ class Store {
       });
       const data = await response.json();
       if (data.error) {
-        return {error: data.error};
+        return { error: data.error };
       } else {
         return data;
       }
     } catch (err) {
-      return {error: err.message};
+      return { error: err.message };
     }
   }
 
@@ -122,7 +122,7 @@ class Store {
         `/payment_intents/${paymentIntent}/shipping_change`,
         {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             shippingOption,
             items,
@@ -131,12 +131,12 @@ class Store {
       );
       const data = await response.json();
       if (data.error) {
-        return {error: data.error};
+        return { error: data.error };
       } else {
         return data;
       }
     } catch (err) {
-      return {error: err.message};
+      return { error: err.message };
     }
   }
 
@@ -151,7 +151,7 @@ class Store {
         `/payment_intents/${paymentIntent}/update_currency`,
         {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             currency,
             payment_methods,
@@ -160,12 +160,12 @@ class Store {
       );
       const data = await response.json();
       if (data.error) {
-        return {error: data.error};
+        return { error: data.error };
       } else {
         return data;
       }
     } catch (err) {
-      return {error: err.message};
+      return { error: err.message };
     }
   }
 
@@ -196,7 +196,7 @@ class Store {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
       };
-      const quantity = randomQuantity(1, 2);
+      const quantity = 1;
       let sku = product.skus.data[0];
       let skuPrice = this.formatPrice(sku.price, sku.currency);
       let lineItemPrice = this.formatPrice(sku.price * quantity, sku.currency);

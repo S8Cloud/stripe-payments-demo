@@ -16,22 +16,10 @@ stripe.setApiVersion(config.stripe.apiVersion);
 // Replace this list with information about your store's products.
 const products = [
   {
-    id: 'increment',
-    name: 'Increment Magazine',
-    price: 399,
-    attributes: {issue: 'Issue #3 “Development”'},
-  },
-  {
     id: 'shirt',
     name: 'Stripe Shirt',
     price: 999,
     attributes: {size: 'Small Standard', gender: 'Woman'},
-  },
-  {
-    id: 'pins',
-    name: 'Stripe Pins',
-    price: 799,
-    attributes: {set: 'Collector Set'},
   },
 ];
 
@@ -61,10 +49,10 @@ const createStoreProducts = async () => {
     );
 
     console.log(
-      `🛍️  Successfully created ${stripeProducts.length} products on your Stripe account.`
+      `Successfully created ${stripeProducts.length} products on your Stripe account.`
     );
   } catch (error) {
-    console.log(`⚠️  Error: ${error.message}`);
+    console.log(`Error: ${error.message}`);
   }
 };
 

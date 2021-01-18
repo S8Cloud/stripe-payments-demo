@@ -11,7 +11,7 @@
 'use strict';
 
 const config = require('./config');
-const {products} = require('./inventory');
+const { products } = require('./inventory');
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(config.stripe.secretKey);
@@ -49,28 +49,28 @@ const calculatePaymentAmount = async items => {
 
 // Create the PaymentIntent on the backend.
 router.post('/payment_intents', async (req, res, next) => {
-  let {currency, items} = req.body;
+  let { currency, items } = req.body;
   const amount = await calculatePaymentAmount(items);
 
   try {
     //build initial payment methods which should exclude currency specific ones
     const initPaymentMethods = config.paymentMethods.filter(paymentMethod => paymentMethod !== 'au_becs_debit');
-    
+
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       payment_method_types: initPaymentMethods,
     });
-    return res.status(200).json({paymentIntent});
+    return res.status(200).json({ paymentIntent });
   } catch (err) {
-    return res.status(500).json({error: err.message});
+    return res.status(500).json({ error: err.message });
   }
 });
 
 // Update PaymentIntent with shipping cost.
 router.post('/payment_intents/:id/shipping_change', async (req, res, next) => {
-  const {items, shippingOption} = req.body;
+  const { items, shippingOption } = req.body;
   let amount = await calculatePaymentAmount(items);
   amount += products.getShippingCost(shippingOption.id);
 
@@ -78,25 +78,25 @@ router.post('/payment_intents/:id/shipping_change', async (req, res, next) => {
     const paymentIntent = await stripe.paymentIntents.update(req.params.id, {
       amount,
     });
-    return res.status(200).json({paymentIntent});
+    return res.status(200).json({ paymentIntent });
   } catch (err) {
-    return res.status(500).json({error: err.message});
+    return res.status(500).json({ error: err.message });
   }
 });
 
 // Update PaymentIntent with currency and paymentMethod.
 router.post('/payment_intents/:id/update_currency', async (req, res, next) => {
-  const {currency, payment_methods} = req.body; 
+  const { currency, payment_methods } = req.body;
   try {
     const paymentIntent = await stripe.paymentIntents.update(req.params.id, {
       currency,
       payment_method_types: payment_methods,
     });
-    return res.status(200).json({paymentIntent});
+    return res.status(200).json({ paymentIntent });
   } catch (err) {
-    return res.status(500).json({error: err.message});
+    return res.status(500).json({ error: err.message });
   }
-}); 
+});
 
 // Webhook handler to process payments for sources asynchronously.
 router.post('/webhook', async (req, res) => {
@@ -114,7 +114,7 @@ router.post('/webhook', async (req, res) => {
         config.stripe.webhookSecret
       );
     } catch (err) {
-      console.log(`⚠️  Webhook signature verification failed.`);
+      console.log(`Webhook signature verification failed.`);
       return res.sendStatus(400);
     }
     // Extract the object from the event.
@@ -133,7 +133,7 @@ router.post('/webhook', async (req, res) => {
     const paymentIntent = object;
     if (eventType === 'payment_intent.succeeded') {
       console.log(
-        `🔔  Webhook received! Payment for PaymentIntent ${paymentIntent.id} succeeded.`
+        `Webhook received! Payment for PaymentIntent ${paymentIntent.id} succeeded.`
       );
     } else if (eventType === 'payment_intent.payment_failed') {
       const paymentSourceOrMethod = paymentIntent.last_payment_error
@@ -141,7 +141,7 @@ router.post('/webhook', async (req, res) => {
         ? paymentIntent.last_payment_error.payment_method
         : paymentIntent.last_payment_error.source;
       console.log(
-        `🔔  Webhook received! Payment on ${paymentSourceOrMethod.object} ${paymentSourceOrMethod.id} of type ${paymentSourceOrMethod.type} for PaymentIntent ${paymentIntent.id} failed.`
+        `Webhook received! Payment on ${paymentSourceOrMethod.object} ${paymentSourceOrMethod.id} of type ${paymentSourceOrMethod.type} for PaymentIntent ${paymentIntent.id} failed.`
       );
       // Note: you can use the existing PaymentIntent to prompt your customer to try again by attaching a newly created source:
       // https://stripe.com/docs/payments/payment-intents/usage#lifecycle
@@ -155,7 +155,7 @@ router.post('/webhook', async (req, res) => {
     object.metadata.paymentIntent
   ) {
     const source = object;
-    console.log(`🔔  Webhook received! The source ${source.id} is chargeable.`);
+    console.log(`Webhook received! The source ${source.id} is chargeable.`);
     // Find the corresponding PaymentIntent this source is for by looking in its metadata.
     const paymentIntent = await stripe.paymentIntents.retrieve(
       source.metadata.paymentIntent
@@ -165,7 +165,7 @@ router.post('/webhook', async (req, res) => {
       return res.sendStatus(403);
     }
     // Confirm the PaymentIntent with the chargeable source.
-    await stripe.paymentIntents.confirm(paymentIntent.id, {source: source.id});
+    await stripe.paymentIntents.confirm(paymentIntent.id, { source: source.id });
   }
 
   // Monitor `source.failed` and `source.canceled` events.
@@ -175,7 +175,7 @@ router.post('/webhook', async (req, res) => {
     object.metadata.paymentIntent
   ) {
     const source = object;
-    console.log(`🔔  The source ${source.id} failed or timed out.`);
+    console.log(`The source ${source.id} failed or timed out.`);
     // Cancel the PaymentIntent.
     await stripe.paymentIntents.cancel(source.metadata.paymentIntent);
   }
@@ -213,13 +213,13 @@ router.get('/products/:id', async (req, res) => {
 // Retrieve the PaymentIntent status.
 router.get('/payment_intents/:id/status', async (req, res) => {
   const paymentIntent = await stripe.paymentIntents.retrieve(req.params.id);
-  const payload = {status: paymentIntent.status};
+  const payload = { status: paymentIntent.status };
 
   if (paymentIntent.last_payment_error) {
     payload.last_payment_error = paymentIntent.last_payment_error.message;
   }
 
-  res.json({paymentIntent: payload});
+  res.json({ paymentIntent: payload });
 });
 
 module.exports = router;
